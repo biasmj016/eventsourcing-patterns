@@ -1,10 +1,10 @@
-package com.eventsourcing.patterns;
+package com.eventsourcing.payment;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EventsourcingPatternsApplicationTests {
+class PaymentApplicationTests {
 
     @Test
     void contextLoads() {
