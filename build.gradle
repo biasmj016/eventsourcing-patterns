@@ -21,6 +21,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.axonframework:axon-spring-boot-starter:4.6.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.axonframework:axon-test:4.6.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
