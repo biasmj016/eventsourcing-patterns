@@ -14,7 +14,7 @@ public interface PaymentCommand {
     CompletableFuture<String> approvePayment(String paymentId);
 
     @Service
-    class PaymentCommandService {
+    class PaymentCommandService implements PaymentCommand {
 
         private final CommandGateway commandGateway;
 
@@ -22,14 +22,17 @@ public interface PaymentCommand {
             this.commandGateway = commandGateway;
         }
 
+        @Override
         public CompletableFuture<String> requestPayment(String paymentId, String memberId, String itemId, double amount) {
             return commandGateway.send(new RequestPaymentCommand(paymentId, memberId, itemId, amount));
         }
 
+        @Override
         public CompletableFuture<String> verifyPayment(String paymentId) {
             return commandGateway.send(new VerifyPaymentCommand(paymentId));
         }
 
+        @Override
         public CompletableFuture<String> approvePayment(String paymentId) {
             return commandGateway.send(new ApprovePaymentCommand(paymentId));
         }
