@@ -4,10 +4,32 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @Entity
-public record Product(
-        @Id
-        String itemId,
-        double price,
-        String description) {
-}
+public class Product {
 
+    @Id
+    private String itemId;
+    private double price;
+    private String description;
+
+    protected Product() {}
+
+    public Product(String itemId, double price, String description) {
+        this.itemId = itemId;
+        this.price = price;
+        this.description = description;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    private static final double EPSILON = 0.0001;
+
+    public boolean isPriceMatching(double amount) {
+        return Math.abs(price - amount) <= EPSILON;
+    }
+}
