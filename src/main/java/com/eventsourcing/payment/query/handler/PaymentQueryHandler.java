@@ -21,24 +21,24 @@ public class PaymentQueryHandler {
     @EventHandler
     public void on(PaymentRequestedEvent event) {
         repository.save(new PaymentHistory(
-                event.paymentId(),
-                event.memberId(),
-                event.itemId(),
-                event.amount(),
+                event.getPaymentId(),
+                event.getMemberId(),
+                event.getItemId(),
+                event.getAmount(),
                 REQUESTED
         ));
     }
 
     @EventHandler
     public void on(PaymentVerifiedEvent event) {
-        repository.findById(event.paymentId())
+        repository.findById(event.getPaymentId())
                 .map(history -> history.toUpdatedStatus(VERIFIED))
                 .ifPresent(repository::save);
     }
 
     @EventHandler
     public void on(PaymentApprovedEvent event) {
-        repository.findById(event.paymentId())
+        repository.findById(event.getPaymentId())
                 .map(history -> history.toUpdatedStatus(APPROVED))
                 .ifPresent(repository::save);
     }
