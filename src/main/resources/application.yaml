@@ -1,0 +1,31 @@
+server:
+  port: 8090
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment
+    username: payment
+    password: paymentpw
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  sql:
+    init:
+      mode: always
+
+axon:
+  axonserver:
+    servers: localhost:8124
+  serializer:
+    general: jackson
+    events: jackson
+    messages: jackson
+  eventhandling:
+    processors:
+      paymentProcessor:
+        mode: tracking
+
+logging:
+  level:
+    org.axonframework: DEBUG

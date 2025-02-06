@@ -1,21 +1,10 @@
 version: '3.8'
 
 services:
-  app:
-    image: openjdk:21
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/payment
-      - SPRING_DATASOURCE_USERNAME=payment
-      - SPRING_DATASOURCE_PASSWORD=paymentpw
-    stdin_open: true
-    tty: true
-
-  postgres:
+  db:
     image: postgres:15
+    container_name: postgres-db
+    restart: always
     environment:
       POSTGRES_DB: payment
       POSTGRES_USER: payment
@@ -24,6 +13,27 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - payment-network
+
+  axon-server:
+    image: axoniq/axonserver:latest
+    container_name: axon-server
+    restart: always
+    ports:
+      - "8024:8024" # Web UI
+      - "8124:8124" # Axon Server connection
+    volumes:
+      - axonserver_data:/data
+      - axonserver_events:/events
+    networks:
+      - payment-network
 
 volumes:
   postgres_data:
+  axonserver_data:
+  axonserver_events:
+
+networks:
+  payment-network:
+    driver: bridge
