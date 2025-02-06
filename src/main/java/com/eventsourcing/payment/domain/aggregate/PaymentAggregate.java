@@ -28,19 +28,19 @@ public final class PaymentAggregate {
     @CommandHandler
     public PaymentAggregate(RequestPaymentCommand command) {
         apply(new PaymentRequestedEvent(
-                command.paymentId(),
-                command.memberId(),
-                command.itemId(),
-                command.amount()
+                command.getPaymentId(),
+                command.getMemberId(),
+                command.getItemId(),
+                command.getAmount()
         ));
     }
 
     @EventSourcingHandler
     public void on(PaymentRequestedEvent event) {
-        this.paymentId = event.paymentId();
-        this.memberId = event.memberId();
-        this.itemId = event.itemId();
-        this.amount = event.amount();
+        this.paymentId = event.getPaymentId();
+        this.memberId = event.getMemberId();
+        this.itemId = event.getItemId();
+        this.amount = event.getAmount();
         this.verified = false;
         this.approved = false;
     }
@@ -48,7 +48,7 @@ public final class PaymentAggregate {
     @CommandHandler
     public void handle(VerifyPaymentCommand command) {
         if (this.verified) throw new IllegalStateException("Payment is already verified.");
-        apply(new PaymentVerifiedEvent(command.paymentId()));
+        apply(new PaymentVerifiedEvent(command.getPaymentId()));
     }
 
     @EventSourcingHandler
@@ -60,7 +60,7 @@ public final class PaymentAggregate {
     public void handle(ApprovePaymentCommand command) {
         if (!verified) throw new IllegalStateException("Payment must be verified before approval.");
         if (this.approved) throw new IllegalStateException("Payment is already approved.");
-        apply(new PaymentApprovedEvent(command.paymentId()));
+        apply(new PaymentApprovedEvent(command.getPaymentId()));
     }
 
     @EventSourcingHandler

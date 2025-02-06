@@ -1,4 +1,13 @@
 package com.eventsourcing.payment.domain.event;
 
-public record PaymentApprovedEvent(String paymentId) implements PaymentEvent {
+public class PaymentApprovedEvent implements PaymentEvent {
+    private final String paymentId;
+
+    public PaymentApprovedEvent(String paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    public String getPaymentId() {
+        return paymentId;
+    }
 }
