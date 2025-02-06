@@ -4,7 +4,6 @@ import com.eventsourcing.payment.domain.command.ApprovePaymentCommand;
 import com.eventsourcing.payment.domain.command.RequestPaymentCommand;
 import com.eventsourcing.payment.domain.command.VerifyPaymentCommand;
 import com.eventsourcing.payment.repository.MemberRepository;
-import com.eventsourcing.payment.repository.PaymentHistoryRepository;
 import com.eventsourcing.payment.repository.ProductRepository;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.stereotype.Service;
@@ -14,23 +13,18 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class PaymentCommandService {
     private final CommandGateway commandGateway;
-    private final PaymentHistoryRepository paymentHistoryRepository;
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
 
     public PaymentCommandService(CommandGateway commandGateway,
-                                 PaymentHistoryRepository paymentHistoryRepository,
                                  MemberRepository memberRepository,
                                  ProductRepository productRepository) {
         this.commandGateway = commandGateway;
-        this.paymentHistoryRepository = paymentHistoryRepository;
         this.memberRepository = memberRepository;
         this.productRepository = productRepository;
     }
 
     public CompletableFuture<Object> requestPayment(String paymentId, String memberId, String itemId,  int count) {
-        if (paymentHistoryRepository.existsById(paymentId)) throw new IllegalStateException("Duplicate payment request detected: " + paymentId);
-
         double totalAmount = productRepository.findById(itemId)
                 .map(p -> p.getPrice() * count)
                 .orElseThrow(() -> new IllegalStateException("Product not found: " + itemId));

@@ -6,7 +6,6 @@ import com.eventsourcing.payment.domain.command.VerifyPaymentCommand;
 import com.eventsourcing.payment.query.model.Member;
 import com.eventsourcing.payment.query.model.Product;
 import com.eventsourcing.payment.repository.MemberRepository;
-import com.eventsourcing.payment.repository.PaymentHistoryRepository;
 import com.eventsourcing.payment.repository.ProductRepository;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,14 +17,12 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class PaymentCommandServiceTest {
 
     private CommandGateway commandGateway;
-    private PaymentHistoryRepository paymentHistoryRepository;
     private MemberRepository memberRepository;
     private ProductRepository productRepository;
     private PaymentCommandService service;
@@ -33,10 +30,9 @@ class PaymentCommandServiceTest {
     @BeforeEach
     void setUp() {
         commandGateway = Mockito.mock(CommandGateway.class);
-        paymentHistoryRepository = Mockito.mock(PaymentHistoryRepository.class);
         memberRepository = Mockito.mock(MemberRepository.class);
         productRepository = Mockito.mock(ProductRepository.class);
-        service = new PaymentCommandService(commandGateway, paymentHistoryRepository, memberRepository, productRepository);
+        service = new PaymentCommandService(commandGateway, memberRepository, productRepository);
     }
 
     @Test
@@ -57,18 +53,8 @@ class PaymentCommandServiceTest {
         ArgumentCaptor<RequestPaymentCommand> captor = ArgumentCaptor.forClass(RequestPaymentCommand.class);
         verify(commandGateway, times(1)).send(captor.capture());
         RequestPaymentCommand sentCommand = captor.getValue();
-        assertThat(sentCommand.paymentId()).isEqualTo(paymentId);
+        assertThat(sentCommand.getPaymentId()).isEqualTo(paymentId);
         assertThat(result).isCompletedWithValue(paymentId);
-    }
-
-    @Test
-    void testRequestPayment_duplicate() {
-        String paymentId = "payment_req_202502031547";
-        when(paymentHistoryRepository.existsById(paymentId)).thenReturn(true);
-
-        assertThatThrownBy(() -> service.requestPayment(paymentId, "01000000000", "Ticket_BUS", 10000))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Duplicate payment request");
     }
 
     @Test
@@ -90,7 +76,7 @@ class PaymentCommandServiceTest {
         ArgumentCaptor<VerifyPaymentCommand> captor = ArgumentCaptor.forClass(VerifyPaymentCommand.class);
         verify(commandGateway, times(1)).send(captor.capture());
         VerifyPaymentCommand sentCommand = captor.getValue();
-        assertThat(sentCommand.paymentId()).isEqualTo(paymentId);
+        assertThat(sentCommand.getPaymentId()).isEqualTo(paymentId);
         assertThat(result).isCompletedWithValue(paymentId);
     }
 
@@ -162,7 +148,7 @@ class PaymentCommandServiceTest {
         ArgumentCaptor<ApprovePaymentCommand> captor = ArgumentCaptor.forClass(ApprovePaymentCommand.class);
         verify(commandGateway, times(1)).send(captor.capture());
         ApprovePaymentCommand sentCommand = captor.getValue();
-        assertThat(sentCommand.paymentId()).isEqualTo(paymentId);
+        assertThat(sentCommand.getPaymentId()).isEqualTo(paymentId);
         assertThat(result).isCompletedWithValue(paymentId);
     }
 }
