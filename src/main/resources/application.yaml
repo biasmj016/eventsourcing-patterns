@@ -19,7 +19,7 @@ axon:
     servers: localhost:8124
   serializer:
     general: jackson
-    events: jackson
+    events: xstream
     messages: jackson
   eventhandling:
     processors:

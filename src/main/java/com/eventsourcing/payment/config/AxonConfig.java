@@ -1,21 +1,26 @@
 package com.eventsourcing.payment.config;
 
-import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.axonframework.config.Configurer;
-import org.axonframework.config.DefaultConfigurer;
+import com.thoughtworks.xstream.XStream;
+import org.axonframework.serialization.Serializer;
+import org.axonframework.serialization.xml.XStreamSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class AxonConfig {
 
     @Bean
-    public Configurer axonConfigurer() {
-        return DefaultConfigurer.defaultConfiguration();
-    }
+    @Primary
+    public Serializer xStreamSerializer() {
+        XStream xStream = new XStream();
+        xStream.allowTypesByWildcard(new String[]{
+                "com.eventsourcing.payment.domain.**",
+                "com.eventsourcing.payment.query.**"
+        });
 
-    @Bean
-    public CommandGateway commandGateway(Configurer configurer) {
-        return configurer.buildConfiguration().commandGateway();
+        return XStreamSerializer.builder()
+                .xStream(xStream)
+                .build();
     }
 }
