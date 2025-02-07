@@ -4,6 +4,7 @@ import com.eventsourcing.payment.domain.command.ApprovePaymentCommand;
 import com.eventsourcing.payment.domain.command.RequestPaymentCommand;
 import com.eventsourcing.payment.domain.command.VerifyPaymentCommand;
 import com.eventsourcing.payment.repository.MemberRepository;
+import com.eventsourcing.payment.repository.PaymentHistoryRepository;
 import com.eventsourcing.payment.repository.ProductRepository;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.stereotype.Service;
@@ -13,13 +14,16 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class PaymentCommandService {
     private final CommandGateway commandGateway;
+    private final PaymentHistoryRepository paymentHistoryRepository;
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
 
     public PaymentCommandService(CommandGateway commandGateway,
+                                 PaymentHistoryRepository paymentHistoryRepository,
                                  MemberRepository memberRepository,
                                  ProductRepository productRepository) {
         this.commandGateway = commandGateway;
+        this.paymentHistoryRepository = paymentHistoryRepository;
         this.memberRepository = memberRepository;
         this.productRepository = productRepository;
     }
@@ -38,9 +42,9 @@ public class PaymentCommandService {
         memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalStateException("Member not found: " + memberId));
 
-        productRepository.findById(itemId)
-                .filter(p -> p.isPriceMatching(amount))
-                .orElseThrow(() -> new IllegalStateException("Product is invalid: " + itemId + "(" + amount + " Won)"));
+        paymentHistoryRepository.findById(paymentId)
+                .filter(p -> p.checkPayment(amount, itemId))
+                .orElseThrow(() -> new IllegalStateException("Amount is not match: " + itemId + "(" + amount + " Won)"));
 
         return commandGateway.send(new VerifyPaymentCommand(paymentId))
                 .exceptionally(ex -> {

@@ -4,8 +4,10 @@ import com.eventsourcing.payment.domain.command.ApprovePaymentCommand;
 import com.eventsourcing.payment.domain.command.RequestPaymentCommand;
 import com.eventsourcing.payment.domain.command.VerifyPaymentCommand;
 import com.eventsourcing.payment.query.model.Member;
+import com.eventsourcing.payment.query.model.PaymentHistory;
 import com.eventsourcing.payment.query.model.Product;
 import com.eventsourcing.payment.repository.MemberRepository;
+import com.eventsourcing.payment.repository.PaymentHistoryRepository;
 import com.eventsourcing.payment.repository.ProductRepository;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +18,7 @@ import org.mockito.Mockito;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import static com.eventsourcing.payment.query.model.PaymentHistory.PaymentStatus.REQUESTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -23,6 +26,7 @@ import static org.mockito.Mockito.*;
 class PaymentCommandServiceTest {
 
     private CommandGateway commandGateway;
+    private PaymentHistoryRepository paymentHistoryRepository;
     private MemberRepository memberRepository;
     private ProductRepository productRepository;
     private PaymentCommandService service;
@@ -30,9 +34,10 @@ class PaymentCommandServiceTest {
     @BeforeEach
     void setUp() {
         commandGateway = Mockito.mock(CommandGateway.class);
+        paymentHistoryRepository = Mockito.mock(PaymentHistoryRepository.class);
         memberRepository = Mockito.mock(MemberRepository.class);
         productRepository = Mockito.mock(ProductRepository.class);
-        service = new PaymentCommandService(commandGateway, memberRepository, productRepository);
+        service = new PaymentCommandService(commandGateway, paymentHistoryRepository, memberRepository, productRepository);
     }
 
     @Test
@@ -63,11 +68,11 @@ class PaymentCommandServiceTest {
         String memberId = "01000000000";
         String itemId = "Ticket_BUS";
         double amount = 10000;
-        // Setup repository mocks: Member exists and Product exists with matching price.
+
         when(memberRepository.findById(memberId))
                 .thenReturn(Optional.of(new Member(memberId, "Test Member")));
-        when(productRepository.findById(itemId))
-                .thenReturn(Optional.of(new Product(itemId, 10000, "Bus Ticket")));
+        when(paymentHistoryRepository.findById(paymentId))
+                .thenReturn(Optional.of(new PaymentHistory(paymentId, memberId,  "Ticket_BUS", 10000, REQUESTED)));
         when(commandGateway.send(any(VerifyPaymentCommand.class)))
                 .thenReturn(CompletableFuture.completedFuture(paymentId));
 
@@ -113,7 +118,7 @@ class PaymentCommandServiceTest {
         try {
             service.verifyPayment(paymentId, memberId, itemId, amount);
         } catch (IllegalStateException e) {
-            assertThat(e.getMessage()).contains("Product is invalid: " + itemId);
+            assertThat(e.getMessage()).contains("Amount is not match: " + itemId);
         }
         verify(commandGateway, never()).send(any(VerifyPaymentCommand.class));
     }
@@ -132,7 +137,7 @@ class PaymentCommandServiceTest {
         try {
             service.verifyPayment(paymentId, memberId, itemId, amount);
         } catch (IllegalStateException e) {
-            assertThat(e.getMessage()).contains("Product is invalid");
+            assertThat(e.getMessage()).contains("Amount is not match");
         }
         verify(commandGateway, never()).send(any(VerifyPaymentCommand.class));
     }
