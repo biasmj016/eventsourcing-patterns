@@ -7,10 +7,12 @@ import com.eventsourcing.payment.query.model.PaymentHistory;
 import com.eventsourcing.payment.repository.PaymentHistoryRepository;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.eventsourcing.payment.query.model.PaymentHistory.PaymentStatus.*;
 
 @Component
+@Transactional
 public class PaymentQueryHandler {
     private final PaymentHistoryRepository repository;
 

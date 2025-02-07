@@ -35,8 +35,8 @@ class PaymentQueryHandlerTest {
         verify(repository, times(1)).save(captor.capture());
 
         PaymentHistory savedHistory = captor.getValue();
-        assertThat(savedHistory.paymentId()).isEqualTo("payment_req_202502031547");
-        assertThat(savedHistory.status()).isEqualTo(REQUESTED);
+        assertThat(savedHistory.getPaymentId()).isEqualTo("payment_req_202502031547");
+        assertThat(savedHistory.getStatus()).isEqualTo(REQUESTED);
     }
 
     @Test
@@ -51,7 +51,7 @@ class PaymentQueryHandlerTest {
         verify(repository, times(1)).save(captor.capture());
 
         PaymentHistory updatedHistory = captor.getValue();
-        assertThat(updatedHistory.status()).isEqualTo(VERIFIED);
+        assertThat(updatedHistory.getStatus()).isEqualTo(VERIFIED);
     }
 
     @Test
@@ -66,6 +66,6 @@ class PaymentQueryHandlerTest {
         verify(repository, times(1)).save(captor.capture());
 
         PaymentHistory updatedHistory = captor.getValue();
-        assertThat(updatedHistory.status()).isEqualTo(APPROVED);
+        assertThat(updatedHistory.getStatus()).isEqualTo(APPROVED);
     }
 }
