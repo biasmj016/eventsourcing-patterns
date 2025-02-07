@@ -26,10 +26,4 @@ public class Product {
     public double getPrice() {
         return price;
     }
-
-    private static final double EPSILON = 0.0001;
-
-    public boolean isPriceMatching(double amount) {
-        return Math.abs(price - amount) <= EPSILON;
-    }
 }

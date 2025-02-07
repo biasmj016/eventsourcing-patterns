@@ -4,9 +4,23 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @Entity
-public record Member(
-        @Id String memberId,
-        String name
-) {
-}
+public class Member {
+    @Id
+    private String memberId;
+    private String name;
 
+    protected Member() {}
+
+    public Member(String memberId, String name) {
+        this.memberId = memberId;
+        this.name = name;
+    }
+
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
