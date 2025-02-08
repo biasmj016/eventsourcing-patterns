@@ -7,12 +7,15 @@ import com.eventsourcing.payment.repository.MemberRepository;
 import com.eventsourcing.payment.repository.PaymentHistoryRepository;
 import com.eventsourcing.payment.repository.ProductRepository;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
 
 @Service
 public class PaymentCommandService {
+    private static final Logger logger = LoggerFactory.getLogger(PaymentCommandService.class);
     private final CommandGateway commandGateway;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final MemberRepository memberRepository;
@@ -29,6 +32,7 @@ public class PaymentCommandService {
     }
 
     public CompletableFuture<Object> requestPayment(String paymentId, String memberId, String itemId,  int count) {
+        logger.info("[PaymentCommandService] Requesting payment: paymentId={}, memberId={}, itemId={}, count={}", paymentId, memberId, itemId, count);
         double totalAmount = productRepository.findById(itemId)
                 .map(p -> p.getPrice() * count)
                 .orElseThrow(() -> new IllegalStateException("Product not found: " + itemId));
@@ -39,6 +43,7 @@ public class PaymentCommandService {
 
 
     public CompletableFuture<Object> verifyPayment(String paymentId, String memberId, String itemId, double amount) {
+        logger.info("[PaymentCommandService] Verifying payment: paymentId={}, memberId={}, itemId={}, amount={}", paymentId, memberId, itemId, amount);
         memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalStateException("Member not found: " + memberId));
 
@@ -53,6 +58,7 @@ public class PaymentCommandService {
     }
 
     public CompletableFuture<Object> approvePayment(String paymentId) {
+        logger.info("[PaymentCommandService] Approving payment: paymentId={}", paymentId);
         return commandGateway.send(new ApprovePaymentCommand(paymentId));
     }
 
