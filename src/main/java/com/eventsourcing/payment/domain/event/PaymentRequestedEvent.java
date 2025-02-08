@@ -28,4 +28,12 @@ public class PaymentRequestedEvent implements PaymentEvent {
     public double getAmount() {
         return amount;
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "PaymentRequestedEvent {\n    paymentId: '%s',\n    memberId: '%s',\n    itemId: '%s',\n    amount: %.2f\n}",
+                paymentId, memberId, itemId, amount
+        );
+    }
 }

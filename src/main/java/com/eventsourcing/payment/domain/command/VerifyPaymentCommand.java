@@ -14,4 +14,11 @@ public class VerifyPaymentCommand implements PaymentCommand {
     public String getPaymentId() {
         return paymentId;
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "VerifyPaymentCommand {\n    paymentId: '%s'\n}", paymentId
+        );
+    }
 }

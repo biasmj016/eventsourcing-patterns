@@ -21,4 +21,12 @@ public class RequestPaymentCommand implements PaymentCommand {
     public String getMemberId() { return memberId; }
     public String getItemId() { return itemId; }
     public double getAmount() { return amount; }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "RequestPaymentCommand {\n    paymentId: '%s',\n    memberId: '%s',\n    itemId: '%s',\n    amount: %.2f\n}",
+                paymentId, memberId, itemId, amount
+        );
+    }
 }

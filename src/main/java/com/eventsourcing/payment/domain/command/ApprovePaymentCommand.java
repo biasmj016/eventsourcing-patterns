@@ -14,4 +14,11 @@ public class ApprovePaymentCommand implements PaymentCommand {
     public String getPaymentId() {
         return paymentId;
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "ApprovePaymentCommand {\n    paymentId: '%s'\n}", paymentId
+        );
+    }
 }

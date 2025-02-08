@@ -10,4 +10,11 @@ public class PaymentVerifiedEvent implements PaymentEvent {
     public String getPaymentId() {
         return paymentId;
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "PaymentVerifiedEvent {\n    paymentId: '%s'\n}", paymentId
+        );
+    }
 }
