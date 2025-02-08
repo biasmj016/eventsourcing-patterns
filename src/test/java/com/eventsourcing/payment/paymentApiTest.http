@@ -1,0 +1,24 @@
+### 1️⃣ 결제 요청 (Request Payment)
+POST http://localhost:8090/payments/request
+Content-Type: application/json
+
+{
+  "paymentId": "pay-8317",
+  "memberId": "mem-001",
+  "itemId": "BUS_TICKET",
+  "count": 2
+}
+
+### 2️⃣ 결제 검증 (Verify Payment)
+POST http://localhost:8090/payments/verify
+Content-Type: application/json
+
+{
+  "paymentId": "pay-8317",
+  "memberId": "mem-001",
+  "itemId": "BUS_TICKET",
+  "amount": 10000
+}
+
+### 3️⃣ 결제 승인 (Approve Payment)
+POST http://localhost:8090/payments/approve/pay-8317
